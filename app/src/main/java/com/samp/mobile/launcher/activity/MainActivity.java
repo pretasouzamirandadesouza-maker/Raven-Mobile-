@@ -1,0 +1,104 @@
+package ru.unisamp_mobile.launcher.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import ru.unisamp_mobile.game.R;
+import ru.unisamp_mobile.game.SAMP;
+
+import java.io.File;
+import java.io.FileOutputStream;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Button btnPlay;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnPlay = findViewById(R.id.btnPlay);
+
+        writeLog("Launcher iniciado");
+
+        btnPlay.setOnClickListener(v -> {
+            writeLog("Botão PLAY clicado");
+
+            boolean ok = writeServerConfig("15.204.150.91", 17930);
+
+            if (!ok) {
+                writeLog("Erro ao criar samp.cfg");
+                Toast.makeText(this, "Erro ao criar samp.cfg", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            try {
+                writeLog("Tentando abrir SAMP");
+
+                Intent intent = new Intent(MainActivity.this, SAMP.class);
+
+                // obrigatório pra não fechar
+                intent.putExtra("begi_otsyda", "fdfef8itfh94t6ywefgiewfwrdi");
+
+                startActivity(intent);
+
+                writeLog("Intent enviada com sucesso");
+            } catch (Exception e) {
+                writeLog("Erro ao abrir jogo: " + e.toString());
+                e.printStackTrace();
+                Toast.makeText(this, "Erro ao abrir o jogo: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private boolean writeServerConfig(String ip, int port) {
+        try {
+            File dir = getExternalFilesDir(null);
+            if (dir == null) {
+                writeLog("getExternalFilesDir retornou null");
+                return false;
+            }
+
+            File cfg = new File(dir, "samp.cfg");
+            String content =
+                    "name=AndroidUser\n" +
+                    "server=" + ip + ":" + port + "\n";
+
+            FileOutputStream fos = new FileOutputStream(cfg, false);
+            fos.write(content.getBytes());
+            fos.flush();
+            fos.close();
+
+            writeLog("samp.cfg criado em: " + cfg.getAbsolutePath());
+            writeLog("Conteúdo do cfg: " + content.replace("\n", " | "));
+
+            return true;
+        } catch (Exception e) {
+            writeLog("Erro ao escrever samp.cfg: " + e.toString());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void writeLog(String msg) {
+        try {
+            File dir = getExternalFilesDir(null);
+            if (dir == null) return;
+
+            File logFile = new File(dir, "launcher_log.txt");
+            String line = System.currentTimeMillis() + " - " + msg + "\n";
+
+            FileOutputStream fos = new FileOutputStream(logFile, true);
+            fos.write(line.getBytes());
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

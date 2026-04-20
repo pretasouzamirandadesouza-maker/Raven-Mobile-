@@ -1,0 +1,62 @@
+name: Build APK DEBUG
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Corrigir projeto automaticamente
+        run: |
+          echo "Corrigindo namespace e applicationId..."
+          sed -i "s/namespace 'com\.samp\.mobile\.launcher'/namespace 'ru.unisamp_mobile.game'/g" app/build.gradle
+          sed -i 's/applicationId "com\.samp\.mobile\.launcher"/applicationId "ru.unisamp_mobile.game"/g' app/build.gradle
+
+          echo "Forçando build 32 bits..."
+          sed -i "/abiFilters/c\            abiFilters 'armeabi-v7a'" app/build.gradle
+          sed -i "/pickFirsts += \\['lib\\/arm64-v8a\\/libshadowhook.so', 'lib\\/armeabi-v7a\\/libshadowhook.so'\\]/d" app/build.gradle
+
+          echo "Removendo package do Manifest..."
+          sed -i 's/ package="com\.samp\.mobile\.launcher"//g' app/src/main/AndroidManifest.xml
+          sed -i 's/ package="com\.samp\.mobile"//g' app/src/main/AndroidManifest.xml
+
+          echo "Corrigindo imports do R..."
+          grep -rl "import ru.unisamp_mobile.game.launcher.R;" app/src/main/java | xargs -r sed -i 's/import com\.samp\.mobile\.launcher\.R;/import ru.unisamp_mobile.game.R;/g'
+          grep -rl "import ru.unisamp_mobile.game.R;" app/src/main/java | xargs -r sed -i 's/import com\.samp\.mobile\.R;/import ru.unisamp_mobile.game.R;/g'
+
+          echo "Removendo Obfuscate..."
+          grep -rl "import com.joom.paranoid.Obfuscate;" app/src/main/java | xargs -r sed -i '/import com\.joom\.paranoid\.Obfuscate;/d'
+          grep -rl "@Obfuscate" app/src/main/java | xargs -r sed -i '/@Obfuscate/d'
+
+          echo "Removendo arquivo zip quebrado..."
+          rm -f app/src/main/java/ru.unisamp_mobile.game/launcher/other/UnZipCallback.java
+
+          echo "Conferindo principais mudanças..."
+          grep -n "namespace" app/build.gradle || true
+          grep -n "applicationId" app/build.gradle || true
+          head -5 app/src/main/AndroidManifest.xml || true
+
+      - name: Dar permissão pro gradle
+        run: chmod +x gradlew
+
+      - name: Build APK DEBUG
+        run: ./gradlew assembleDebug
+
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk

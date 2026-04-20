@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672546548366",
+    "project_id": "launcher-gta-data",
+    "storage_bucket": "launcher-gta-data.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672546548366:android:d9c9a9184f2754866db7df",
+        "android_client_info": {
+          "package_name": "ru.unisamp_mobile.game.launcher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBazn01K9x7PlirwXG1SWsiW2oyPrMRl8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
