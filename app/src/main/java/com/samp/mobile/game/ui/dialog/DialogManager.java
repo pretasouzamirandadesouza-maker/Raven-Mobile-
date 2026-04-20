@@ -1,4 +1,4 @@
-package ru.unisamp_mobile.game.game.ui.dialog;
+package com.samp.mobile.game.ui.dialog;
 
 import android.app.Activity;
 import android.content.Context;
