@@ -1,79 +1,100 @@
-package ru.unisamp_mobile.game;
+package com.samp.mobile.game;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
 import com.joom.paranoid.Obfuscate;
-
-import ru.unisamp_mobile.game.ui.AttachEdit;
-import ru.unisamp_mobile.game.ui.CustomKeyboard;
-import ru.unisamp_mobile.game.ui.LoadingScreen;
-import ru.unisamp_mobile.game.ui.HeightProvider;
-import ru.unisamp_mobile.game.ui.dialog.DialogManager;
+import com.samp.mobile.game.ui.AttachEdit;
+import com.samp.mobile.game.ui.CustomKeyboard;
+import com.samp.mobile.game.ui.LoadingScreen;
+import com.samp.mobile.game.ui.dialog.DialogManager;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 @Obfuscate
-public class SAMP extends GTASA implements CustomKeyboard.InputListener, HeightProvider.HeightListener {
+public class SAMP extends GTASA implements CustomKeyboard.InputListener {
+
     private static final String TAG = "SAMP";
     private static SAMP instance;
 
     private CustomKeyboard mKeyboard;
     private DialogManager mDialog;
-    private HeightProvider mHeightProvider;
-
     private AttachEdit mAttachEdit;
     private LoadingScreen mLoadingScreen;
-
-    public native void sendDialogResponse(int i, int i2, int i3, byte[] str);
 
     public static SAMP getInstance() {
         return instance;
     }
 
-    private void showTab() {
+    public native void sendDialogResponse(int i, int i2, int i3, byte[] str);
 
+    private native void onInputEnd(byte[] str);
+    private native void initializeSAMP();
+    public native void onEventBackPressed();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "**** onCreate");
+        super.onCreate(savedInstanceState);
+
+        instance = this;
+
+        try {
+            mKeyboard = new CustomKeyboard(this);
+            mDialog = new DialogManager(this);
+            mAttachEdit = new AttachEdit(this);
+            mLoadingScreen = new LoadingScreen(this);
+
+            initializeSAMP();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao iniciar SAMP", e);
+        }
     }
 
-    private void hideTab() {
+    public void showDialog(int dialogId, int dialogTypeId, byte[] bArr, byte[] bArr2, byte[] bArr3, byte[] bArr4) {
+        final String caption = new String(bArr, StandardCharsets.UTF_8);
+        final String content = new String(bArr2, StandardCharsets.UTF_8);
+        final String leftBtnText = new String(bArr3, StandardCharsets.UTF_8);
+        final String rightBtnText = new String(bArr4, StandardCharsets.UTF_8);
 
+        runOnUiThread(() -> mDialog.show(dialogId, dialogTypeId, caption, content, leftBtnText, rightBtnText));
     }
 
-    private void setTab(int id, String name, int score, int ping) {
-
+    private void showKeyboard() {
+        runOnUiThread(() -> mKeyboard.ShowInputLayout());
     }
 
-    private void clearTab() {
-
+    private void hideKeyboard() {
+        runOnUiThread(() -> mKeyboard.HideInputLayout());
     }
 
-    private void showLoadingScreen() {
+    private void showEditObject() {
+        runOnUiThread(() -> mAttachEdit.show());
+    }
 
+    private void hideEditObject() {
+        runOnUiThread(() -> mAttachEdit.hide());
     }
 
     private void hideLoadingScreen() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mLoadingScreen.hide();
-            }
-        });
+        runOnUiThread(() -> mLoadingScreen.hide());
     }
 
     public void setPauseState(boolean pause) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (pause) {
-                    mDialog.hideWithoutReset();
-                    mAttachEdit.hideWithoutReset();
-                } else {
-                    if (mDialog.isShow)
-                        mDialog.showWithOldContent();
-                    if (mAttachEdit.isShow)
-                        mAttachEdit.showWithoutReset();
+        runOnUiThread(() -> {
+            if (pause) {
+                mDialog.hideWithoutReset();
+                mAttachEdit.hideWithoutReset();
+            } else {
+                if (mDialog.isShow) {
+                    mDialog.showWithOldContent();
+                }
+
+                if (mAttachEdit.isShow) {
+                    mAttachEdit.showWithoutReset();
                 }
             }
         });
@@ -84,91 +105,21 @@ public class SAMP extends GTASA implements CustomKeyboard.InputListener, HeightP
         System.exit(0);
     }
 
-    public void showDialog(int dialogId, int dialogTypeId, byte[] bArr, byte[] bArr2, byte[] bArr3, byte[] bArr4) {
-        final String caption = new String(bArr, StandardCharsets.UTF_8);
-        final String content = new String(bArr2, StandardCharsets.UTF_8);
-        final String leftBtnText = new String(bArr3, StandardCharsets.UTF_8);
-        final String rightBtnText = new String(bArr4, StandardCharsets.UTF_8);
-        runOnUiThread(() -> this.mDialog.show(dialogId, dialogTypeId, caption, content, leftBtnText, rightBtnText));
-    }
-
-    private native void onInputEnd(byte[] str);
-
     @Override
     public void OnInputEnd(String str) {
         byte[] toReturn = null;
+
         try {
             toReturn = str.getBytes("windows-1251");
-        } catch (UnsupportedEncodingException e) {
-
+        } catch (UnsupportedEncodingException ignored) {
         }
 
         try {
             onInputEnd(toReturn);
-        } catch (UnsatisfiedLinkError e5) {
-            Log.e(TAG, e5.getMessage());
+        } catch (UnsatisfiedLinkError e) {
+            Log.e(TAG, "Erro em onInputEnd", e);
         }
     }
-
-    private void showKeyboard() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("AXL", "showKeyboard()");
-                mKeyboard.ShowInputLayout();
-            }
-        });
-    }
-
-    private void hideKeyboard() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mKeyboard.HideInputLayout();
-            }
-        });
-    }
-
-    private void showEditObject() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mAttachEdit.show();
-            }
-        });
-    }
-
-    private void hideEditObject() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mAttachEdit.hide();
-            }
-        });
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "**** onCreate");
-        super.onCreate(savedInstanceState);
-
-        // mHeightProvider = new HeightProvider(this);
-
-        mKeyboard = new CustomKeyboard(this);
-        mDialog = new DialogManager(this);
-        mAttachEdit = new AttachEdit(this);
-        mLoadingScreen = new LoadingScreen(this);
-
-        instance = this;
-
-        try {
-            initializeSAMP();
-        } catch (UnsatisfiedLinkError e5) {
-            Log.e(TAG, e5.getMessage());
-        }
-    }
-
-    private native void initializeSAMP();
 
     @Override
     public void onStart() {
@@ -186,23 +137,6 @@ public class SAMP extends GTASA implements CustomKeyboard.InputListener, HeightP
     public void onResume() {
         Log.i(TAG, "**** onResume");
         super.onResume();
-        // mHeightProvider.init(view);
-    }
-
-    public native void onEventBackPressed();
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        onEventBackPressed();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            onEventBackPressed();
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -224,8 +158,16 @@ public class SAMP extends GTASA implements CustomKeyboard.InputListener, HeightP
     }
 
     @Override
-    public void onHeightChanged(int orientation, int height) {
-        // mKeyboard.onHeightChanged(height);
-        // mDialog.onHeightChanged(height);
+    public void onBackPressed() {
+        super.onBackPressed();
+        onEventBackPressed();
     }
-}
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            onEventBackPressed();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+                }
