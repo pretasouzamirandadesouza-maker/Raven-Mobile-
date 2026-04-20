@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.samp.mobile'
+    namespace 'ru.unisamp_mobile.game'
     compileSdk 34
     ndkVersion '26.2.11394342'
 
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.samp.mobile"
+        applicationId "ru.unisamp_mobile.game"
         minSdk 26
         targetSdk 34
         versionCode 2
