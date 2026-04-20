@@ -57,7 +57,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.joom.paranoid.Obfuscate;
 import ru.unisamp_mobile.game.R;
-import ru.unisamp_mobile.game.game.ui.HudManager;
+import com.samp.mobile.game.ui.HudManager;
 
 import java.io.FileInputStream;
 import java.io.IOException;
