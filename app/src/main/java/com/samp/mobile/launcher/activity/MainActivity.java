@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.samp.mobile.game.R;
+import com.samp.mobile.R;
 import com.samp.mobile.game.SAMP;
 
 import java.io.File;
