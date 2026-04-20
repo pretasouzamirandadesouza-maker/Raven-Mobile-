@@ -1,4 +1,4 @@
-package ru.unisamp_mobile.game.game.ui;
+package com.samp.mobile.game.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
