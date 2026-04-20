@@ -48,7 +48,7 @@
         </provider>
 
         <activity
-            android:name="ru.unisamp_mobile.launcher.activity.MainActivity"
+            android:name="com.samp.mobile.launcher.activity.MainActivity"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:windowSoftInputMode="adjustNothing"
@@ -61,7 +61,7 @@
         </activity>
 
         <activity
-            android:name="ru.unisamp_mobile.game.SAMP"
+            android:name="com.samp.mobile.game.SAMP"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
