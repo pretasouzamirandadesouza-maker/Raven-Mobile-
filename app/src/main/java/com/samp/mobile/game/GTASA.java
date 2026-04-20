@@ -1,4 +1,4 @@
-package ru.unisamp_mobile.game;
+package com.samp.mobile.game;
 
 import android.content.Intent;
 import android.content.res.Configuration;
