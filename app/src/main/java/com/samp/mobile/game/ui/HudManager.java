@@ -1,4 +1,4 @@
-package ru.unisamp_mobile.game.game.ui;
+package com.samp.mobile.game.ui;
 
 import android.app.Activity;
 import android.view.View;
