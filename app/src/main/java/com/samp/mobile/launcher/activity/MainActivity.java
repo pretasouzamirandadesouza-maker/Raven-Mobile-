@@ -1,4 +1,4 @@
-package ru.unisamp_mobile.launcher.activity;
+package com.samp.mobile.launcher.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +7,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.unisamp_mobile.game.R;
-import ru.unisamp_mobile.game.SAMP;
+import com.samp.mobile.R;
+import com.samp.mobile.game.SAMP;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,15 +41,13 @@ public class MainActivity extends AppCompatActivity {
                 writeLog("Tentando abrir SAMP");
 
                 Intent intent = new Intent(MainActivity.this, SAMP.class);
-
-                // obrigatório pra não fechar
                 intent.putExtra("begi_otsyda", "fdfef8itfh94t6ywefgiewfwrdi");
 
                 startActivity(intent);
 
                 writeLog("Intent enviada com sucesso");
             } catch (Exception e) {
-                writeLog("Erro ao abrir jogo: " + e.toString());
+                writeLog("Erro ao abrir jogo: " + e);
                 e.printStackTrace();
                 Toast.makeText(this, "Erro ao abrir o jogo: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -76,10 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
             writeLog("samp.cfg criado em: " + cfg.getAbsolutePath());
             writeLog("Conteúdo do cfg: " + content.replace("\n", " | "));
-
             return true;
+
         } catch (Exception e) {
-            writeLog("Erro ao escrever samp.cfg: " + e.toString());
+            writeLog("Erro ao escrever samp.cfg: " + e);
             e.printStackTrace();
             return false;
         }
